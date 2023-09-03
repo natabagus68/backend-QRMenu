@@ -1,11 +1,14 @@
+import { FileSystem } from "../middlewares/FileSystem";
 import User from "../models/User"
 import sequelize from "../models/sequelize"
 import bcrypt from 'bcryptjs'
 import { validationResult } from "express-validator";
+
 class UserController {
     async createUser(req, res) {
         const { name, email, password } = req.body;
         const avatarPath = req.file ? '/image/user/' + req.file.filename : null;
+
 
         const transaction = await sequelize.transaction();
 
@@ -26,10 +29,10 @@ class UserController {
             if (userHasCreated && user) {
                 return res.json({
                     message: 'User created',
-                    statusCode: 200
+                    data: user
                 });
             } else {
-                return res.status(500).json({ message: 'Failed to create data user' });
+                return res.status(400).json({ message: 'Email is exists' });
             }
         } catch (error) {
             await transaction.rollback();
@@ -40,6 +43,7 @@ class UserController {
 
     async updateUser(req, res) {
         const errors = validationResult(req);
+        const user = await User.findByPk(req.params.id);
 
         if (!errors.isEmpty()) {
             return res.status(400).json({ errors: errors.array() });
@@ -51,9 +55,11 @@ class UserController {
         // Periksa apakah ada file gambar yang diunggah
         if (req.file) {
             avatarPath = '/image/user/' + req.file.filename;
+            const filenames = user.getDataValue('avatharPath').split('/').pop()
+            console.log(filenames)
+            FileSystem.destroy(filenames, 'user')
         }
-
-        const user = await User.findByPk(req.params.id);
+        console.log(avatarPath)
 
         if (!user) {
             return res.status(404).json({ error: 'Pengguna tidak ditemukan' });
@@ -64,7 +70,7 @@ class UserController {
                 {
                     name,
                     email,
-                    avatarPath: avatarPath ? avatarPath : user.avatarPath
+                    avatharPath: avatarPath ? avatarPath : user.avatarPath
                 },
                 {
                     where: {

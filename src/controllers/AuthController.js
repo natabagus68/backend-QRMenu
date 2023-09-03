@@ -30,7 +30,8 @@ class AuthController {
 
         res.json({
             message: 'success',
-            token: buildToken
+            token: buildToken,
+            data: user
         })
     }
 

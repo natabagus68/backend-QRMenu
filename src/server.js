@@ -12,6 +12,7 @@ const __dirname = dirname(__filename);
 const app = express();
 const { name, host, port, uriPrefix } = configs.app;
 app.use('/image/user', express.static(__dirname + '../tempStorage/user'))
+app.use('/image/company', express.static(__dirname + '../tempStorage/company'))
 app.use(express.json());
 app.use(cors());
 app.use(express.urlencoded({ extended: true }));

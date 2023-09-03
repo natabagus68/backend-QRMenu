@@ -5,7 +5,7 @@ import { validateUpdaeUser } from '../validations/user-validation'
 import { FileSystem } from '../middlewares/FileSystem'
 const router = express.Router()
 
-router.post('/', VerifyToken.handle, FileSystem.validate, FileSystem.upload('user').single('image'), UserController.createUser.bind(UserController))
-router.put('/:id', VerifyToken.handle, FileSystem.validate, validateUpdaeUser, UserController.updateUser.bind(UserController))
+router.post('/', FileSystem.upload('user', 'image'), UserController.createUser.bind(UserController))
+router.put('/:id', VerifyToken.handle, FileSystem.upload('user', 'image'), UserController.updateUser.bind(UserController))
 
 export default router
